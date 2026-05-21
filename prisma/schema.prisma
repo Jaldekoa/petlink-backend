@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model adoptions {
+  id         BigInt           @id @default(autoincrement())
+  user_id    String           @db.Uuid
+  animal_id  BigInt
+  status     adoption_status? @default(pending)
+  message    String?
+  created_at DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at DateTime?        @default(now()) @db.Timestamp(6)
+  animals    animals          @relation(fields: [animal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([animal_id], map: "idx_adoptions_animal")
+  @@index([user_id], map: "idx_adoptions_user")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model animal_images {
+  id         BigInt    @id @default(autoincrement())
+  animal_id  BigInt
+  image_url  String
+  is_main    Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  animals    animals   @relation(fields: [animal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model animals {
+  id                BigInt          @id @default(autoincrement())
+  shelter_id        BigInt
+  name              String          @db.VarChar(120)
+  species           String          @db.VarChar(80)
+  breed             String?         @db.VarChar(120)
+  sex               animal_sex?
+  birth_date        DateTime?       @db.Date
+  weight            Decimal?        @db.Decimal(5, 2)
+  description       String?
+  status            animal_status?  @default(available)
+  vaccinated        Boolean?        @default(false)
+  sterilized        Boolean?        @default(false)
+  good_with_animals Boolean?
+  good_with_kids    Boolean?
+  energy_level      String?         @db.VarChar(50)
+  arrival_date      DateTime?       @db.Date
+  created_at        DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?       @default(now()) @db.Timestamp(6)
+  adoptions         adoptions[]
+  animal_images     animal_images[]
+  shelters          shelters        @relation(fields: [shelter_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  likes             likes[]
+  sponsorships      sponsorships[]
+
+  @@index([shelter_id], map: "idx_animals_shelter")
+  @@index([species], map: "idx_animals_species")
+  @@index([status], map: "idx_animals_status")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model likes {
+  user_id    String    @db.Uuid
+  animal_id  BigInt
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  animals    animals   @relation(fields: [animal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, animal_id])
+  @@index([animal_id], map: "idx_likes_animal")
+  @@index([user_id], map: "idx_likes_user")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notifications {
+  id         BigInt    @id @default(autoincrement())
+  user_id    String    @db.Uuid
+  title      String    @db.VarChar(255)
+  body       String?
+  is_read    Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_notifications_user")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model payment_history {
+  id                BigInt       @id @default(autoincrement())
+  sponsorship_id    BigInt
+  amount            Decimal      @db.Decimal(10, 2)
+  payment_method    String?      @db.VarChar(50)
+  payment_reference String?
+  paid_at           DateTime?    @default(now()) @db.Timestamp(6)
+  sponsorships      sponsorships @relation(fields: [sponsorship_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model shelter_members {
+  id         BigInt    @id @default(autoincrement())
+  shelter_id BigInt
+  user_id    String    @db.Uuid
+  role       String?   @default("worker") @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  shelters   shelters  @relation(fields: [shelter_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([shelter_id, user_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model shelters {
+  id              BigInt            @id @default(autoincrement())
+  name            String            @db.VarChar(150)
+  description     String?
+  email           String?           @db.VarChar(255)
+  phone           String?           @db.VarChar(30)
+  website_url     String?
+  logo_url        String?
+  cover_image_url String?
+  address         String?
+  city            String?           @db.VarChar(100)
+  country         String?           @db.VarChar(100)
+  latitude        Decimal?          @db.Decimal(10, 8)
+  longitude       Decimal?          @db.Decimal(11, 8)
+  verified        Boolean?          @default(false)
+  verified_at     DateTime?         @db.Timestamp(6)
+  created_at      DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?         @default(now()) @db.Timestamp(6)
+  animals         animals[]
+  shelter_members shelter_members[]
+
+  @@index([latitude, longitude], map: "idx_shelters_location")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model sponsorships {
+  id              BigInt              @id @default(autoincrement())
+  user_id         String              @db.Uuid
+  animal_id       BigInt
+  monthly_amount  Decimal             @db.Decimal(10, 2)
+  status          sponsorship_status? @default(active)
+  start_date      DateTime?           @default(dbgenerated("CURRENT_DATE")) @db.Date
+  end_date        DateTime?           @db.Date
+  created_at      DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?           @default(now()) @db.Timestamp(6)
+  payment_history payment_history[]
+  animals         animals             @relation(fields: [animal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users           users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([animal_id], map: "idx_sponsorships_animal")
+  @@index([user_id], map: "idx_sponsorships_user")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model users {
+  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username        String            @unique @db.VarChar(50)
+  email           String            @unique @db.VarChar(255)
+  password_hash   String
+  full_name       String?           @db.VarChar(150)
+  role            user_role         @default(user)
+  description     String?
+  avatar_url      String?
+  phone           String?           @db.VarChar(30)
+  is_verified     Boolean?          @default(false)
+  created_at      DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?         @default(now()) @db.Timestamp(6)
+  adoptions       adoptions[]
+  likes           likes[]
+  notifications   notifications[]
+  shelter_members shelter_members[]
+  sponsorships    sponsorships[]
+}
+
+enum adoption_status {
+  pending
+  approved
+  rejected
+  completed
+}
+
+enum animal_sex {
+  male
+  female
+}
+
+enum animal_status {
+  available
+  reserved
+  adopted
+  medical_hold
+}
+
+enum sponsorship_status {
+  active
+  cancelled
+  paused
+}
+
+enum user_role {
+  admin
+  user
+  worker
+}
