@@ -4,16 +4,26 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
+=======
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+>>>>>>> origin/dev
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Jaldekoa/petlink-backend.git"
   },
+<<<<<<< HEAD
+=======
+  "type": "module",
+>>>>>>> origin/dev
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -21,6 +31,7 @@
     "url": "https://github.com/Jaldekoa/petlink-backend/issues"
   },
   "homepage": "https://github.com/Jaldekoa/petlink-backend#readme",
+<<<<<<< HEAD
   "dependencies": {
     "@prisma/client": "^6.9.0",
     "bcryptjs": "^3.0.2",
@@ -40,3 +51,25 @@
     "typescript": "^5.8.3"
   }
 }
+=======
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.9.1",
+    "nodemon": "^3.1.14",
+    "prisma": "^7.8.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  }
+}
+>>>>>>> origin/dev
