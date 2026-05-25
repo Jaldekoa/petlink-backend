@@ -1,9 +1,6 @@
 import { userService } from '@/services'
 import { Request, Response } from 'express'
 
-interface IdParam {
-    id: string
-}
 
 const getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -14,9 +11,9 @@ const getUsers = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-const getUserById = async (req: Request<IdParam>, res: Response): Promise<void> => {
+const getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user = await userService.getUserById(req.params.id)
+        const user = await userService.getUserById(req.params.id as string)
         if (!user) {
             res.status(404).json({ error: 'Usuario no encontrado' })
             return
@@ -26,6 +23,20 @@ const getUserById = async (req: Request<IdParam>, res: Response): Promise<void> 
         res.status(500).json({ error: 'Error al obtener el usuario' })
     }
 }
+
+const getUserByEmail = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await userService.getUserByEmail(req.params.email as string)
+        if (!user) {
+            res.status(404).json({ error: 'Usuario no encontrado' })
+            return
+        }
+        res.json(user)
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener el usuario' })
+    }
+}
+
 
 const createUser = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -40,9 +51,9 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-const updateUser = async (req: Request<IdParam>, res: Response): Promise<void> => {
+const updateUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user = await userService.updateUser(req.params.id, req.body)
+        const user = await userService.updateUser(req.params.id as string, req.body)
         res.json(user)
     } catch (error: any) {
         if (error.code === 'P2025') {
@@ -53,9 +64,9 @@ const updateUser = async (req: Request<IdParam>, res: Response): Promise<void> =
     }
 }
 
-const deleteUser = async (req: Request<IdParam>, res: Response): Promise<void> => {
+const deleteUser = async (req: Request, res: Response): Promise<void> => {
     try {
-        await userService.deleteUser(req.params.id)
+        await userService.deleteUser(req.params.id as string)
         res.status(204).send()
     } catch (error: any) {
         if (error.code === 'P2025') {
@@ -66,4 +77,4 @@ const deleteUser = async (req: Request<IdParam>, res: Response): Promise<void> =
     }
 }
 
-export const userController = { getUsers, getUserById, createUser, updateUser, deleteUser }
+export const userController = { getUsers, getUserById, getUserByEmail, createUser, updateUser, deleteUser }
