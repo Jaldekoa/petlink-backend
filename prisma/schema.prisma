@@ -3,181 +3,182 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model adoptions {
-  id         BigInt           @id @default(autoincrement())
-  user_id    String           @db.Uuid
-  animal_id  BigInt
-  status     adoption_status? @default(pending)
-  message    String?
-  created_at DateTime?        @default(now()) @db.Timestamp(6)
-  updated_at DateTime?        @default(now()) @db.Timestamp(6)
-  animals    animals          @relation(fields: [animal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users      users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model Adoption {
+  id        BigInt          @id @default(autoincrement())
+  userId    String          @map("user_id") @db.Uuid
+  animalId  BigInt          @map("animal_id")
+  status    adoption_status? @default(pending)
+  message   String?
+  createdAt DateTime?       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime?       @default(now()) @map("updated_at") @db.Timestamp(6)
+  animal    Animal          @relation(fields: [animalId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([animal_id], map: "idx_adoptions_animal")
-  @@index([user_id], map: "idx_adoptions_user")
+  @@index([animalId], map: "idx_adoptions_animal")
+  @@index([userId], map: "idx_adoptions_user")
+  @@map("adoptions")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model animal_images {
-  id         BigInt    @id @default(autoincrement())
-  animal_id  BigInt
-  image_url  String
-  is_main    Boolean?  @default(false)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  animals    animals   @relation(fields: [animal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model AnimalImage {
+  id        BigInt    @id @default(autoincrement())
+  animalId  BigInt    @map("animal_id")
+  imageUrl  String    @map("image_url")
+  isMain    Boolean?  @default(false) @map("is_main")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  animal    Animal    @relation(fields: [animalId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("animal_images")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model animals {
-  id                BigInt          @id @default(autoincrement())
-  shelter_id        BigInt
-  name              String          @db.VarChar(120)
-  species           String          @db.VarChar(80)
-  breed             String?         @db.VarChar(120)
-  sex               animal_sex?
-  birth_date        DateTime?       @db.Date
-  weight            Decimal?        @db.Decimal(5, 2)
-  description       String?
-  status            animal_status?  @default(available)
-  vaccinated        Boolean?        @default(false)
-  sterilized        Boolean?        @default(false)
-  good_with_animals Boolean?
-  good_with_kids    Boolean?
-  energy_level      String?         @db.VarChar(50)
-  arrival_date      DateTime?       @db.Date
-  created_at        DateTime?       @default(now()) @db.Timestamp(6)
-  updated_at        DateTime?       @default(now()) @db.Timestamp(6)
-  adoptions         adoptions[]
-  animal_images     animal_images[]
-  shelters          shelters        @relation(fields: [shelter_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  likes             likes[]
-  sponsorships      sponsorships[]
+model Animal {
+  id              BigInt         @id @default(autoincrement())
+  shelterId       BigInt         @map("shelter_id")
+  name            String         @db.VarChar(120)
+  species         String         @db.VarChar(80)
+  breed           String?        @db.VarChar(120)
+  sex             animal_sex?
+  birthDate       DateTime?      @map("birth_date") @db.Date
+  weight          Decimal?       @db.Decimal(5, 2)
+  description     String?
+  status          animal_status? @default(available)
+  vaccinated      Boolean?       @default(false)
+  sterilized      Boolean?       @default(false)
+  goodWithAnimals Boolean?       @map("good_with_animals")
+  goodWithKids    Boolean?       @map("good_with_kids")
+  energyLevel     String?        @map("energy_level") @db.VarChar(50)
+  arrivalDate     DateTime?      @map("arrival_date") @db.Date
+  createdAt       DateTime?      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime?      @default(now()) @map("updated_at") @db.Timestamp(6)
+  adoptions       Adoption[]
+  images          AnimalImage[]
+  shelter         Shelter        @relation(fields: [shelterId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  likes           Like[]
+  sponsorships    Sponsorship[]
 
-  @@index([shelter_id], map: "idx_animals_shelter")
+  @@index([shelterId], map: "idx_animals_shelter")
   @@index([species], map: "idx_animals_species")
   @@index([status], map: "idx_animals_status")
+  @@map("animals")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model likes {
-  user_id    String    @db.Uuid
-  animal_id  BigInt
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  animals    animals   @relation(fields: [animal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model Like {
+  userId    String    @map("user_id") @db.Uuid
+  animalId  BigInt    @map("animal_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  animal    Animal    @relation(fields: [animalId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([user_id, animal_id])
-  @@index([animal_id], map: "idx_likes_animal")
-  @@index([user_id], map: "idx_likes_user")
+  @@id([userId, animalId])
+  @@index([animalId], map: "idx_likes_animal")
+  @@index([userId], map: "idx_likes_user")
+  @@map("likes")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model notifications {
-  id         BigInt    @id @default(autoincrement())
-  user_id    String    @db.Uuid
-  title      String    @db.VarChar(255)
-  body       String?
-  is_read    Boolean?  @default(false)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model Notification {
+  id        BigInt    @id @default(autoincrement())
+  userId    String    @map("user_id") @db.Uuid
+  title     String    @db.VarChar(255)
+  body      String?
+  isRead    Boolean?  @default(false) @map("is_read")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([user_id], map: "idx_notifications_user")
+  @@index([userId], map: "idx_notifications_user")
+  @@map("notifications")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model payment_history {
-  id                BigInt       @id @default(autoincrement())
-  sponsorship_id    BigInt
-  amount            Decimal      @db.Decimal(10, 2)
-  payment_method    String?      @db.VarChar(50)
-  payment_reference String?
-  paid_at           DateTime?    @default(now()) @db.Timestamp(6)
-  sponsorships      sponsorships @relation(fields: [sponsorship_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model PaymentHistory {
+  id                BigInt      @id @default(autoincrement())
+  sponsorshipId     BigInt      @map("sponsorship_id")
+  amount            Decimal     @db.Decimal(10, 2)
+  paymentMethod     String?     @map("payment_method") @db.VarChar(50)
+  paymentReference  String?     @map("payment_reference")
+  paidAt            DateTime?   @default(now()) @map("paid_at") @db.Timestamp(6)
+  sponsorship       Sponsorship @relation(fields: [sponsorshipId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("payment_history")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model shelter_members {
-  id         BigInt    @id @default(autoincrement())
-  shelter_id BigInt
-  user_id    String    @db.Uuid
-  role       String?   @default("worker") @db.VarChar(50)
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  shelters   shelters  @relation(fields: [shelter_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model ShelterMember {
+  id        BigInt    @id @default(autoincrement())
+  shelterId BigInt    @map("shelter_id")
+  userId    String    @map("user_id") @db.Uuid
+  role      String?   @default("worker") @db.VarChar(50)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  shelter   Shelter   @relation(fields: [shelterId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([shelter_id, user_id])
+  @@unique([shelterId, userId])
+  @@map("shelter_members")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model shelters {
-  id              BigInt            @id @default(autoincrement())
-  name            String            @db.VarChar(150)
-  description     String?
-  email           String?           @db.VarChar(255)
-  phone           String?           @db.VarChar(30)
-  website_url     String?
-  logo_url        String?
-  cover_image_url String?
-  address         String?
-  city            String?           @db.VarChar(100)
-  country         String?           @db.VarChar(100)
-  latitude        Decimal?          @db.Decimal(10, 8)
-  longitude       Decimal?          @db.Decimal(11, 8)
-  verified        Boolean?          @default(false)
-  verified_at     DateTime?         @db.Timestamp(6)
-  created_at      DateTime?         @default(now()) @db.Timestamp(6)
-  updated_at      DateTime?         @default(now()) @db.Timestamp(6)
-  animals         animals[]
-  shelter_members shelter_members[]
+model Shelter {
+  id            BigInt          @id @default(autoincrement())
+  name          String          @db.VarChar(150)
+  description   String?
+  email         String?         @db.VarChar(255)
+  phone         String?         @db.VarChar(30)
+  websiteUrl    String?         @map("website_url")
+  logoUrl       String?         @map("logo_url")
+  coverImageUrl String?         @map("cover_image_url")
+  address       String?
+  city          String?         @db.VarChar(100)
+  country       String?         @db.VarChar(100)
+  latitude      Decimal?        @db.Decimal(10, 8)
+  longitude     Decimal?        @db.Decimal(11, 8)
+  verified      Boolean?        @default(false)
+  verifiedAt    DateTime?       @map("verified_at") @db.Timestamp(6)
+  createdAt     DateTime?       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime?       @default(now()) @map("updated_at") @db.Timestamp(6)
+  animals       Animal[]
+  members       ShelterMember[]
 
   @@index([latitude, longitude], map: "idx_shelters_location")
+  @@map("shelters")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model sponsorships {
-  id              BigInt              @id @default(autoincrement())
-  user_id         String              @db.Uuid
-  animal_id       BigInt
-  monthly_amount  Decimal             @db.Decimal(10, 2)
-  status          sponsorship_status? @default(active)
-  start_date      DateTime?           @default(dbgenerated("CURRENT_DATE")) @db.Date
-  end_date        DateTime?           @db.Date
-  created_at      DateTime?           @default(now()) @db.Timestamp(6)
-  updated_at      DateTime?           @default(now()) @db.Timestamp(6)
-  payment_history payment_history[]
-  animals         animals             @relation(fields: [animal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users           users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model Sponsorship {
+  id            BigInt             @id @default(autoincrement())
+  userId        String             @map("user_id") @db.Uuid
+  animalId      BigInt             @map("animal_id")
+  monthlyAmount Decimal            @map("monthly_amount") @db.Decimal(10, 2)
+  status        sponsorship_status? @default(active)
+  startDate     DateTime?          @default(dbgenerated("CURRENT_DATE")) @map("start_date") @db.Date
+  endDate       DateTime?          @map("end_date") @db.Date
+  createdAt     DateTime?          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime?          @default(now()) @map("updated_at") @db.Timestamp(6)
+  payments      PaymentHistory[]
+  animal        Animal             @relation(fields: [animalId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([animal_id], map: "idx_sponsorships_animal")
-  @@index([user_id], map: "idx_sponsorships_user")
+  @@index([animalId], map: "idx_sponsorships_animal")
+  @@index([userId], map: "idx_sponsorships_user")
+  @@map("sponsorships")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model users {
-  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  username        String            @unique @db.VarChar(50)
-  email           String            @unique @db.VarChar(255)
-  password_hash   String
-  full_name       String?           @db.VarChar(150)
-  role            user_role         @default(user)
-  description     String?
-  avatar_url      String?
-  phone           String?           @db.VarChar(30)
-  is_verified     Boolean?          @default(false)
-  created_at      DateTime?         @default(now()) @db.Timestamp(6)
-  updated_at      DateTime?         @default(now()) @db.Timestamp(6)
-  adoptions       adoptions[]
-  likes           likes[]
-  notifications   notifications[]
-  shelter_members shelter_members[]
-  sponsorships    sponsorships[]
+model User {
+  id             String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username       String          @unique @db.VarChar(50)
+  email          String          @unique @db.VarChar(255)
+  passwordHash   String          @map("password_hash")
+  fullName       String?         @map("full_name") @db.VarChar(150)
+  role           user_role       @default(usuario)
+  description    String?
+  avatarUrl      String?         @map("avatar_url")
+  phone          String?         @db.VarChar(30)
+  isVerified     Boolean?        @default(false) @map("is_verified")
+  createdAt      DateTime?       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime?       @default(now()) @map("updated_at") @db.Timestamp(6)
+  adoptions      Adoption[]
+  likes          Like[]
+  notifications  Notification[]
+  shelterMembers ShelterMember[]
+  sponsorships   Sponsorship[]
+
+  @@map("users")
 }
 
 enum adoption_status {
@@ -205,8 +206,8 @@ enum sponsorship_status {
   paused
 }
 
-enum user_role {
-  admin
-  user
-  worker
-}
+  enum user_role {
+    administrador
+    usuario
+    trabajador
+  }
