@@ -7,15 +7,29 @@
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
+    "ignoreDeprecations": "6.0",
+    "types": [
+      "node"
+    ],
     "typeRoots": [
       "./node_modules/@types",
       "./src/types"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "prisma.config.ts"
   ],
   "ts-node": {
-    "files": true
+    "files": true,
+    "require": [
+      "tsconfig-paths/register"
+    ]
   }
 }

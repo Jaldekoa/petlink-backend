@@ -2,6 +2,7 @@ import express from "express";
 import type { Request, Response } from "express";
 import "dotenv/config";
 import cors from "cors";
+import router from "./routers/routes";
 
 // === RUTAS (mañana se descomentan según se vayan creando) ===
 // import authRoutes from "./routes/auth.routes";
@@ -23,9 +24,8 @@ app.use(cors());
 app.use(express.json());
 
 // === RUTA DE PRUEBA ===
-app.get("/", (req: Request, res: Response) => {
-    res.send("API funcionando en navegador");
-});
+app.use("/", router);
+
 
 // === RUTAS DE LA API (mañana se descomentan) ===
 // app.use("/api/auth", authRoutes);
