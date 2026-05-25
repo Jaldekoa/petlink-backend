@@ -89,4 +89,34 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
-export const userController = { getUsers, getUserById, getUserByEmail, createUser, updateUser, deleteUser }
+
+const getMe = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await userService.getMe(req.user!.userId)
+        res.json(user)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Error al obtener el perfil' })
+    }
+}
+
+const updateMe = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await userService.updateMe(req.user!.userId, req.body)
+        res.json(user)
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar el perfil' })
+    }
+}
+
+const deleteMe = async (req: Request, res: Response): Promise<void> => {
+    try {
+        await userService.deleteMe(req.user!.userId)
+        res.status(204).send()
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar la cuenta' })
+    }
+}
+
+
+export const userController = { getUsers, getUserById, getUserByEmail, createUser, updateUser, deleteUser, getMe, updateMe, deleteMe }

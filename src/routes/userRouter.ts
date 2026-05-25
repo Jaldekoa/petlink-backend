@@ -1,13 +1,20 @@
 import { userController } from '@/controllers'
+import { requireRole } from '@/middlewares'
+import { user_role } from '@prisma/client'
 import { Router } from 'express'
 
 const userRouter = Router()
 
-userRouter.get('/', userController.getUsers)
-userRouter.get('/:id', userController.getUserById)
-userRouter.get('/email/:email', userController.getUserByEmail)
-userRouter.post('/', userController.createUser)
-userRouter.put('/:id', userController.updateUser)
-userRouter.delete('/:id', userController.deleteUser)
+
+userRouter.get('/me', userController.getMe)
+userRouter.put('/me', userController.updateMe)
+userRouter.delete('/me', userController.deleteMe)
+
+userRouter.get('/', requireRole(user_role.administrador), userController.getUsers)
+userRouter.get('/:id', requireRole(user_role.administrador), userController.getUserById)
+userRouter.get('/email/:email', requireRole(user_role.administrador), userController.getUserByEmail)
+userRouter.post('/', requireRole(user_role.administrador), userController.createUser)
+userRouter.put('/:id', requireRole(user_role.administrador), userController.updateUser)
+userRouter.delete('/:id', requireRole(user_role.administrador), userController.deleteUser)
 
 export default userRouter

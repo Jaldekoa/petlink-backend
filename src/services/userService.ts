@@ -1,5 +1,5 @@
 import { prisma } from "@/config/prisma"
-import { CreateUserDTO, UpdateUserDTO } from "@/dtos"
+import { CreateUserDTO, UpdateUserAdminDTO, UpdateUserDTO } from "@/dtos"
 import { UserResponse, userSelect } from "@/models/userModel"
 import { PaginatedResponse, PaginationParams } from "@/types"
 import { getPaginationParams, getSearchFilter } from "@/utils/pagination"
@@ -61,7 +61,7 @@ const createUser = async (data: CreateUserDTO): Promise<UserResponse> => {
     })
 }
 
-const updateUser = async (id: string, data: UpdateUserDTO): Promise<UserResponse> => {
+const updateUser = async (id: string, data: UpdateUserAdminDTO): Promise<UserResponse> => {
     return await prisma.user.update({
         where: { id },
         data,
@@ -73,4 +73,23 @@ const deleteUser = async (id: string): Promise<void> => {
     await prisma.user.delete({ where: { id } })
 }
 
-export const userService = { getUsers, getUserById, getUserByEmail, createUser, updateUser, deleteUser }
+const getMe = async (id: string): Promise<UserResponse | null> => {
+    return await prisma.user.findUnique({
+        where: { id },
+        select: userSelect
+    })
+}
+
+const updateMe = async (id: string, data: UpdateUserDTO): Promise<UserResponse> => {
+    return await prisma.user.update({
+        where: { id },
+        data,
+        select: userSelect
+    })
+}
+
+const deleteMe = async (id: string): Promise<void> => {
+    await prisma.user.delete({ where: { id } })
+}
+
+export const userService = { getUsers, getUserById, getUserByEmail, createUser, updateUser, deleteUser, getMe, updateMe, deleteMe }
