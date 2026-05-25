@@ -2,7 +2,7 @@ import express from "express";
 import type { Request, Response } from "express";
 import "dotenv/config";
 import cors from "cors";
-import router from "./routers/routes";
+import router from "./routes/routes";
 
 // === RUTAS IMPLEMENTADAS ===
 import sheltersRoutes from "./routes/shelters.routes";
@@ -10,6 +10,8 @@ import animalsRoutes from "./routes/animals.routes";
 import animalImagesRoutes from "./routes/animalImages.routes";
 import likesRoutes from "./routes/likes.routes";
 import paymentHistoryRoutes from "./routes/paymentHistory.routes";
+import { verifyToken } from "./middlewares";
+
 
 // Fix para serializar BigInt a JSON (necesario con Prisma + PostgreSQL)
 (BigInt.prototype as any).toJSON = function () { return this.toString(); };
