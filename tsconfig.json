@@ -24,7 +24,6 @@
   },
   "include": [
     "src/**/*",
-    "prisma.config.ts"
   ],
   "ts-node": {
     "files": true,

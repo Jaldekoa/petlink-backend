@@ -4,18 +4,15 @@ import "dotenv/config";
 import cors from "cors";
 import router from "./routers/routes";
 
-// === RUTAS (mañana se descomentan según se vayan creando) ===
-// import authRoutes from "./routes/auth.routes";
-// import usersRoutes from "./routes/users.routes";
-// import animalsRoutes from "./routes/animals.routes";
-// import animalImagesRoutes from "./routes/animalImages.routes";
-// import likesRoutes from "./routes/likes.routes";
-// import sheltersRoutes from "./routes/shelters.routes";
-// import shelterMembersRoutes from "./routes/shelterMembers.routes";
-// import adoptionsRoutes from "./routes/adoptions.routes";
-// import sponsorshipsRoutes from "./routes/sponsorships.routes";
-// import paymentHistoryRoutes from "./routes/paymentHistory.routes";
-// import notificationsRoutes from "./routes/notifications.routes";
+// === RUTAS IMPLEMENTADAS ===
+import sheltersRoutes from "./routes/shelters.routes";
+import animalsRoutes from "./routes/animals.routes";
+import animalImagesRoutes from "./routes/animalImages.routes";
+import likesRoutes from "./routes/likes.routes";
+import paymentHistoryRoutes from "./routes/paymentHistory.routes";
+
+// Fix para serializar BigInt a JSON (necesario con Prisma + PostgreSQL)
+(BigInt.prototype as any).toJSON = function () { return this.toString(); };
 
 const app = express();
 
@@ -27,17 +24,19 @@ app.use(express.json());
 app.use("/", router);
 
 
-// === RUTAS DE LA API (mañana se descomentan) ===
+// === RUTAS DE SHELTERS, ANIMALS, LIKES Y PAYMENT-HISTORY ===
+app.use("/api/shelters", sheltersRoutes);
+app.use("/api/animals", animalsRoutes);
+app.use("/api/animals/:animalId/images", animalImagesRoutes);
+app.use("/api/likes", likesRoutes);
+app.use("/api/payment-history", paymentHistoryRoutes);
+
+// === RUTAS PENDIENTES ===
 // app.use("/api/auth", authRoutes);
 // app.use("/api/users", usersRoutes);
-// app.use("/api/animals", animalsRoutes);
-// app.use("/api/animal-images", animalImagesRoutes);
-// app.use("/api/likes", likesRoutes);
-// app.use("/api/shelters", sheltersRoutes);
 // app.use("/api/shelter-members", shelterMembersRoutes);
 // app.use("/api/adoptions", adoptionsRoutes);
 // app.use("/api/sponsorships", sponsorshipsRoutes);
-// app.use("/api/payment-history", paymentHistoryRoutes);
 // app.use("/api/notifications", notificationsRoutes);
 
 // === SERVER ===
