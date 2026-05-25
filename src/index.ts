@@ -2,6 +2,7 @@ import express from "express";
 import type { Request, Response } from "express";
 import "dotenv/config";
 import cors from "cors";
+import router from "./routers/routes";
 
 // === RUTAS IMPLEMENTADAS ===
 import sheltersRoutes from "./routes/shelters.routes";
@@ -19,10 +20,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// === RUTA DE PRUEBA ===
-app.get("/", (_req: Request, res: Response) => {
-  res.json({ status: "ok", message: "PetLink API" });
-});
+app.use("/", router);
+
 
 // === RUTAS DE SHELTERS, ANIMALS, LIKES Y PAYMENT-HISTORY ===
 app.use("/api/shelters", sheltersRoutes);
@@ -31,17 +30,11 @@ app.use("/api/animals/:animalId/images", animalImagesRoutes);
 app.use("/api/likes", likesRoutes);
 app.use("/api/payment-history", paymentHistoryRoutes);
 
-// === RUTAS PENDIENTES ===
-// app.use("/api/auth", authRoutes);
-// app.use("/api/users", usersRoutes);
-// app.use("/api/shelter-members", shelterMembersRoutes);
-// app.use("/api/adoptions", adoptionsRoutes);
-// app.use("/api/sponsorships", sponsorshipsRoutes);
-// app.use("/api/notifications", notificationsRoutes);
+
 
 // === SERVER ===
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
