@@ -20,7 +20,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// === RUTA DE PRUEBA ===
 app.use("/", router);
 
 
@@ -31,17 +30,11 @@ app.use("/api/animals/:animalId/images", animalImagesRoutes);
 app.use("/api/likes", likesRoutes);
 app.use("/api/payment-history", paymentHistoryRoutes);
 
-// === RUTAS PENDIENTES ===
-// app.use("/api/auth", authRoutes);
-// app.use("/api/users", usersRoutes);
-// app.use("/api/shelter-members", shelterMembersRoutes);
-// app.use("/api/adoptions", adoptionsRoutes);
-// app.use("/api/sponsorships", sponsorshipsRoutes);
-// app.use("/api/notifications", notificationsRoutes);
+
 
 // === SERVER ===
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
