@@ -1,3 +1,5 @@
+import { user_role } from "@prisma/client"
+
 export interface CreateUserDTO {
     username: string
     email: string
@@ -13,4 +15,9 @@ export interface UpdateUserDTO {
     description?: string
     avatarUrl?: string
     phone?: string
+}
+
+export interface UpdateUserAdminDTO extends UpdateUserDTO {
+    role?: user_role
+    isVerified?: boolean
 }
