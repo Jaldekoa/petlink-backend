@@ -27,18 +27,18 @@ const getUserById = async (req: Request<IdParam>, res: Response): Promise<void> 
     }
 }
 
-// const createUser = async (req: Request, res: Response): Promise<void> => {
-//     try {
-//         const user = await userService.createUser(req.body)
-//         res.status(201).json(user)
-//     } catch (error: any) {
-//         if (error.code === 'P2002') {
-//             res.status(409).json({ error: 'El email o username ya existe' })
-//             return
-//         }
-//         res.status(500).json({ error: 'Error al crear el usuario' })
-//     }
-// }
+const createUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await userService.createUser(req.body)
+        res.status(201).json(user)
+    } catch (error: any) {
+        if (error.code === 'P2002') {
+            res.status(409).json({ error: 'El email o username ya existe' })
+            return
+        }
+        res.status(500).json({ error: 'Error al crear el usuario' })
+    }
+}
 
 const updateUser = async (req: Request<IdParam>, res: Response): Promise<void> => {
     try {
@@ -66,4 +66,4 @@ const deleteUser = async (req: Request<IdParam>, res: Response): Promise<void> =
     }
 }
 
-export const userController = { getUsers, getUserById, updateUser, deleteUser }
+export const userController = { getUsers, getUserById, createUser, updateUser, deleteUser }

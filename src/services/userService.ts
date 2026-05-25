@@ -20,12 +20,12 @@ const getUserByEmail = async (email: string) => {
     })
 }
 
-// const createUser = async (data: CreateUserDTO): Promise<UserResponse> => {
-//     return await prisma.user.create({
-//         data,
-//         select: userSelect
-//     })
-// }
+const createUser = async (data: CreateUserDTO): Promise<UserResponse> => {
+    return await prisma.user.create({
+        data,
+        select: userSelect
+    })
+}
 
 const updateUser = async (id: string, data: UpdateUserDTO): Promise<UserResponse> => {
     return await prisma.user.update({
@@ -39,4 +39,4 @@ const deleteUser = async (id: string): Promise<void> => {
     await prisma.user.delete({ where: { id } })
 }
 
-export const userService = { getUsers, getUserById, getUserByEmail, updateUser, deleteUser }
+export const userService = { getUsers, getUserById, getUserByEmail, createUser, updateUser, deleteUser }
