@@ -1,11 +1,23 @@
-import { userService } from '@/services'
+import { UserFilters, userService } from '@/services'
+import { user_role } from '@prisma/client'
 import { Request, Response } from 'express'
 
 
 const getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
-        const users = await userService.getUsers()
-        res.json(users)
+        const filters: UserFilters = {
+            page: req.query.page ? Number(req.query.page) : undefined,
+            limit: req.query.limit ? Number(req.query.limit) : undefined,
+            search: req.query.search as string | undefined,
+            role: req.query.role as user_role | undefined,
+            isVerified: req.query.isVerified === 'true'
+                ? true
+                : req.query.isVerified === 'false'
+                    ? false
+                    : undefined,
+        }
+        const result = await userService.getUsers(filters)
+        res.json(result)
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener usuarios' })
     }
