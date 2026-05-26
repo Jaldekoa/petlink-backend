@@ -1,2 +1,5 @@
 export * from './userController'
 export * from './authController'
+export * from './shelterMember.controller'
+export * from './adoption.controller'
+export * from './sponsorship.controller'
