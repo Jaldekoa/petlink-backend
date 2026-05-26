@@ -1,20 +1,34 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
-    "moduleResolution": "node10",
-    "ignoreDeprecations": "6.0",
+    "module": "Node16",
+    "moduleResolution": "node16",
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
+    "ignoreDeprecations": "6.0",
+    "types": [
+      "node"
+    ],
     "typeRoots": [
       "./node_modules/@types",
       "./src/types"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+  ],
   "ts-node": {
-    "files": true
+    "files": true,
+    "require": [
+      "tsconfig-paths/register"
+    ]
   }
 }
