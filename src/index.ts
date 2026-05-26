@@ -2,6 +2,9 @@ import express from "express";
 import type { Request, Response } from "express";
 import "dotenv/config";
 import cors from "cors";
+import { createServer } from "http";
+import { connectMongoDB } from "./config/mongoose";
+import { setupSocket } from "./chat/socket/chat.socket";
 import router from "./routes/routes";
 
 // === RUTAS IMPLEMENTADAS ===
@@ -17,11 +20,23 @@ import { verifyToken } from "./middlewares";
 (BigInt.prototype as any).toJSON = function () { return this.toString(); };
 
 const app = express();
+const httpServer = createServer(app);
 
 // === MIDDLEWARES ===
 app.use(cors());
 app.use(express.json());
 
+// === SERVIR ARCHIVOS ESTÁTICOS DE PRUEBA DEL CHAT===
+app.use(express.static("./public"));
+
+connectMongoDB();
+
+setupSocket(httpServer);
+
+// === RUTA DE PRUEBA ===
+app.get("/", (_req: Request, res: Response) => {
+  res.json({ status: "ok", message: "PetLink API" });
+});
 app.use("/", router);
 
 
@@ -37,6 +52,9 @@ app.use("/api/payment-history", paymentHistoryRoutes);
 // === SERVER ===
 const PORT = process.env.PORT || 3000;
 
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Chat con WebSocket`);
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });

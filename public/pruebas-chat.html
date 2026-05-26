@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PetLink Chat</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+    .container { max-width: 600px; margin: 30px auto; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+    .header { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; padding: 20px; text-align: center; }
+    .header h1 { font-size: 24px; margin-bottom: 5px; }
+    .status { font-size: 12px; opacity: 0.9; }
+    .status-badge { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #27ae60; margin-right: 8px; }
+    .status.disconnected { color: #e74c3c; }
+    .status.disconnected .status-badge { background: #e74c3c; }
+    #messages { height: 400px; overflow-y: auto; padding: 15px; background: #fafafa; }
+    .message { margin: 10px 0; padding: 12px; background: white; border-left: 4px solid #2ecc71; border-radius: 5px; animation: slideIn 0.3s ease; }
+    .message.system { border-left-color: #3498db; background: #ecf0f1; }
+    .message.error { border-left-color: #e74c3c; background: #fadbd8; }
+    .message strong { color: #2ecc71; }
+    .message.system strong { color: #3498db; }
+    .message.error strong { color: #e74c3c; }
+    .message small { color: #999; font-size: 11px; }
+    .message p { margin-top: 8px; color: #333; word-wrap: break-word; }
+    .input-group { display: flex; padding: 15px; background: white; border-top: 1px solid #eee; gap: 10px; }
+    input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+    input:focus { outline: none; border-color: #2ecc71; box-shadow: 0 0 5px rgba(46, 204, 113, 0.3); }
+    input:disabled { background: #f0f0f0; cursor: not-allowed; }
+    button { padding: 12px 25px; background: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    button:hover { background: #e67e22; }
+    button:disabled { background: #bdc3c7; cursor: not-allowed; }
+    .char-count { font-size: 12px; color: #999; margin-top: 5px; text-align: right; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>PetLink Chat</h1>
+      <div class="status" id="status">
+        <span class="status-badge"></span><span id="statusText">Conectando...</span>
+      </div>
+    </div>
+    
+    <div id="messages"></div>
+    
+    <div class="input-group">
+      <input 
+        type="text" 
+        id="messageInput" 
+        placeholder="Escribe un mensaje..."
+        maxlength="500"
+      >
+      <button id="sendBtn" onclick="sendMessage()" disabled>Enviar</button>
+    </div>
+    <div class="char-count">
+      <span id="charCount">0</span>/500
+    </div>
+  </div>
+
+  <script>
+    const socket = io("http://localhost:3000", {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5
+    });
+
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const statusEl = document.getElementById("status");
+    const statusText = document.getElementById("statusText");
+    const charCount = document.getElementById("charCount");
+
+    messageInput.addEventListener("input", () => {
+      charCount.textContent = messageInput.value.length;
+    });
+
+    messageInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter" && messageInput.value.trim()) {
+        sendMessage();
+      }
+    });
+
+    socket.on("connect", () => {
+      console.log("Conectado al chat");
+      statusEl.classList.remove("disconnected");
+      statusText.textContent = "Conectado";
+      sendBtn.disabled = false;
+      messageInput.disabled = false;
+      
+      addSystemMessage("Conectado al servidor");
+      socket.emit("get_history");
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Desconectado");
+      statusEl.classList.add("disconnected");
+      statusText.textContent = "Desconectado";
+      sendBtn.disabled = true;
+      messageInput.disabled = true;
+      
+      addSystemMessage("Desconectado del servidor");
+    });
+
+    socket.on("chat_history", (messages) => {
+      console.log(`Historial recibido: ${messages.length} mensajes`);
+      messages.forEach(msg => addMessageToUI(msg));
+    });
+
+    socket.on("receive_message", (message) => {
+      console.log("Nuevo mensaje:", message);
+      addMessageToUI(message);
+    });
+
+    socket.on("error", (error) => {
+      console.error("Error:", error);
+      addErrorMessage(error.message || "Error desconocido");
+    });
+
+    function sendMessage() {
+      const content = messageInput.value.trim();
+
+      if (!content) {
+        addErrorMessage("El mensaje no puede estar vacío");
+        return;
+      }
+
+      if (content.length > 500) {
+        addErrorMessage("El mensaje no puede exceder 500 caracteres");
+        return;
+      }
+
+      socket.emit("send_message", {
+        userId: "00000000-0000-0000-0000-000000000001",
+        userName: "Test User",
+        content: content
+      });
+
+      messageInput.value = "";
+      charCount.textContent = "0";
+    }
+
+    function addMessageToUI(msg) {
+      const div = document.getElementById("messages");
+      const time = new Date(msg.timestamp).toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      const messageEl = document.createElement("div");
+      messageEl.className = "message";
+      messageEl.innerHTML = `
+        <strong>${escapeHtml(msg.userName)}</strong> <small>${time}</small>
+        <p>${escapeHtml(msg.content)}</p>
+      `;
+
+      div.appendChild(messageEl);
+      div.scrollTop = div.scrollHeight;
+    }
+
+    function addSystemMessage(text) {
+      const div = document.getElementById("messages");
+      const messageEl = document.createElement("div");
+      messageEl.className = "message system";
+      messageEl.innerHTML = `<em>${escapeHtml(text)}</em>`;
+      
+      div.appendChild(messageEl);
+      div.scrollTop = div.scrollHeight;
+    }
+
+    function addErrorMessage(text) {
+      const div = document.getElementById("messages");
+      const messageEl = document.createElement("div");
+      messageEl.className = "message error";
+      messageEl.innerHTML = `<strong>Error:</strong> <p>${escapeHtml(text)}</p>`;
+      
+      div.appendChild(messageEl);
+      div.scrollTop = div.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+  </script>
+</body>
+</html>
