@@ -1,4 +1,4 @@
-import { adoptionController } from '@/controllers/apdoption.controller'
+import { adoptionController } from '@/controllers/adoption.controller'
 import { verifyToken, requireRole } from '@/middlewares/auth.middleware'
 import { user_role } from '@prisma/client'
 import { Router } from 'express'
