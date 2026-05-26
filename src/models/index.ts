@@ -1,3 +1,5 @@
 export * from './userModel'
 export * from './shelterMemberModel'
 export * from './adoptionModel'
+export * from './sponsorshipModel'
+export * from './notificationModel'
