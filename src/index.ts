@@ -2,6 +2,9 @@ import express from "express";
 import type { Request, Response } from "express";
 import "dotenv/config";
 import cors from "cors";
+import { createServer } from "http";
+import { connectMongoDB } from "./config/mongoose";
+import { setupSocket } from "./chat/socket/chat.socket";
 
 // === RUTAS IMPLEMENTADAS ===
 import sheltersRoutes from "./routes/shelters.routes";
@@ -14,10 +17,18 @@ import paymentHistoryRoutes from "./routes/paymentHistory.routes";
 (BigInt.prototype as any).toJSON = function () { return this.toString(); };
 
 const app = express();
+const httpServer = createServer(app);
 
 // === MIDDLEWARES ===
 app.use(cors());
 app.use(express.json());
+
+// === SERVIR ARCHIVOS ESTÁTICOS DE PRUEBA DEL CHAT===
+app.use(express.static("./public"));
+
+connectMongoDB();
+
+setupSocket(httpServer);
 
 // === RUTA DE PRUEBA ===
 app.get("/", (_req: Request, res: Response) => {
@@ -42,6 +53,7 @@ app.use("/api/payment-history", paymentHistoryRoutes);
 // === SERVER ===
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Chat con WebSocket`);
 });
