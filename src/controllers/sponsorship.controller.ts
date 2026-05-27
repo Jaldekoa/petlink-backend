@@ -50,10 +50,17 @@ const createSponsorship = async (req: Request, res: Response): Promise<void> => 
     try {
         const sponsorship = await sponsorshipService.createSponsorship(req.user!.userId, {
             animalId: BigInt(req.body.animalId),
-            monthlyAmount: Number(req.body.monthlyAmount),
+            monthlyAmount:
+                req.body.monthlyAmount === undefined || req.body.monthlyAmount === null
+                    ? null
+                    : Number(req.body.monthlyAmount),
         })
         res.status(201).json(sponsorship)
     } catch (error: any) {
+        if (error.statusCode) {
+            res.status(error.statusCode).json({ error: error.message })
+            return
+        }
         res.status(500).json({ error: 'Error al crear el apadrinamiento' })
     }
 }

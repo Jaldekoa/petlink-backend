@@ -2,6 +2,7 @@ import { prisma } from '@/config/prisma'
 import { CreateAdoptionDTO, UpdateAdoptionDTO } from '@/dtos'
 import { AdoptionResponse, adoptionSelect } from '@/models/adoption.model'
 import { PaginatedResponse, PaginationParams } from '@/types'
+import { AppError } from '@/utils'
 import { getPaginationParams } from '@/utils/pagination'
 import { adoption_status } from '@prisma/client'
 
@@ -72,6 +73,18 @@ const getMyAdoptions = async (userId: string, filters: AdoptionFilters = {}): Pr
 
 // El usuario crea la solicitud, el userId viene del token
 const createAdoption = async (userId: string, data: CreateAdoptionDTO): Promise<AdoptionResponse> => {
+    const existing = await prisma.adoption.findFirst({
+        where: {
+            userId,
+            animalId: data.animalId,
+            status: { not: adoption_status.rechazado },
+        },
+    })
+
+    if (existing) {
+        throw new AppError('Ya tienes una solicitud de adopción para este animal', 409)
+    }
+
     return await prisma.adoption.create({
         data: {
             userId,

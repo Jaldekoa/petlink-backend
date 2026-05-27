@@ -2,6 +2,7 @@ import { prisma } from '@/config/prisma'
 import { CreateSponsorshipDTO, UpdateSponsorshipDTO } from '@/dtos'
 import { SponsorshipResponse, sponsorshipSelect } from '@/models/sponsorship.model'
 import { PaginatedResponse, PaginationParams } from '@/types'
+import { AppError } from '@/utils'
 import { getPaginationParams } from '@/utils/pagination'
 import { sponsorship_status } from '@prisma/client'
 
@@ -71,11 +72,24 @@ const getMySponsorships = async (userId: string, filters: SponsorshipFilters = {
 }
 
 const createSponsorship = async (userId: string, data: CreateSponsorshipDTO): Promise<SponsorshipResponse> => {
+    const existing = await prisma.sponsorship.findFirst({
+        where: {
+            userId,
+            animalId: data.animalId,
+            status: { not: sponsorship_status.cancelado },
+        },
+    })
+
+    if (existing) {
+        throw new AppError('Ya tienes una solicitud de apadrinamiento para este animal', 409)
+    }
+
     return await prisma.sponsorship.create({
         data: {
             userId,
             animalId: data.animalId,
-            monthlyAmount: data.monthlyAmount,
+            monthlyAmount: data.monthlyAmount ?? null,
+            status: data.monthlyAmount ? sponsorship_status.activo : sponsorship_status.pendiente,
         },
         select: sponsorshipSelect
     })
