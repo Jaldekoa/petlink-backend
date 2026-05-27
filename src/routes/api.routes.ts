@@ -24,11 +24,11 @@ apiRouter.use('/shelter-members', shelterMemberRoutes);
 apiRouter.use('/adoption', adoptionRoutes);
 apiRouter.use('/sponsorship', sponsorshipRoutes);
 apiRouter.use('/notifications', notificationRoutes);
-apiRouter.use("/api/shelters", sheltersRoutes);
-apiRouter.use("/api/animals", animalsRoutes);
-apiRouter.use("/api/animals/:animalId/images", animalImagesRoutes);
-apiRouter.use("/api/likes", likesRoutes);
-apiRouter.use("/api/payment-history", paymentHistoryRoutes);
+apiRouter.use("/shelters", sheltersRoutes);
+apiRouter.use("/animals", animalsRoutes);
+apiRouter.use("/animals/:animalId/images", animalImagesRoutes);
+apiRouter.use("/likes", likesRoutes);
+apiRouter.use("/payment-history", paymentHistoryRoutes);
 
 
 export default apiRouter;

@@ -3,6 +3,7 @@ import { CreateNotificationDTO } from '@/dtos'
 import { NotificationResponse, notificationSelect } from '@/models'
 import { PaginatedResponse, PaginationParams } from '@/types'
 import { getPaginationParams } from '@/utils'
+import { getIO } from '@/chat/socket/chat.socket'
 
 export interface NotificationFilters extends PaginationParams {
     isRead?: boolean
@@ -50,12 +51,21 @@ const markAllAsRead = async (userId: string): Promise<void> => {
     })
 }
 
-// Solo para uso interno desde otros servicios
+
 const createNotification = async (data: CreateNotificationDTO): Promise<NotificationResponse> => {
-    return await prisma.notification.create({
+    const notification = await prisma.notification.create({
         data,
         select: notificationSelect
     })
+
+    try {
+        const io = getIO()
+        io.to(data.userId).emit('notification', notification)
+    } catch (error) {
+        console.error('Socket no disponible:', error)
+    }
+
+    return notification
 }
 
 const deleteNotification = async (id: bigint, userId: string): Promise<void> => {
