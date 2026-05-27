@@ -3,7 +3,7 @@ import * as likesService from "../services/likes.service";
 
 export const toggle = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = req.user!.userId;
     const animalId = BigInt(req.params.animalId as string);
     const result = await likesService.toggleLike(userId, animalId);
     res.json(result);
@@ -14,7 +14,7 @@ export const toggle = async (req: Request, res: Response) => {
 
 export const getMyLikes = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = req.user!.userId;
     const likes = await likesService.getLikesByUser(userId);
     res.json(likes);
   } catch {
