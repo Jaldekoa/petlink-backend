@@ -1,9 +1,18 @@
 import { Server as SocketIOServer, Socket } from "socket.io";
 import { Server as HTTPServer } from "http";
 import * as chatService from "../services/chat.service";
+import { getAnimalById } from "@/services/animals.service";
+import { notificationService } from "@/services/notification.service";
 
 let connectedUsers = 0;
 let io: SocketIOServer // ← exportar para usarlo en otros sitios
+
+type AnimalRequestPayload = {
+  type?: "adoption" | "sponsorship";
+  animalId?: string;
+}
+
+type AnimalRequestAck = (response: { ok: true } | { ok: false; error: string }) => void
 
 export const getIO = () => {
   if (!io) throw new Error("Socket.io no inicializado")
@@ -26,8 +35,49 @@ export const setupSocket = (httpServer: HTTPServer) => {
 
     // ← El usuario se une a su sala privada con su userId
     socket.on("join", (userId: string) => {
+      socket.data.userId = userId
       socket.join(userId)
       console.log(`Usuario ${userId} unido a su sala privada`)
+    })
+
+    socket.on("animal_request", async (data: AnimalRequestPayload, callback?: AnimalRequestAck) => {
+      try {
+        const userId = socket.data.userId as string | undefined
+
+        if (!userId) {
+          callback?.({ ok: false, error: "Usuario no unido a su sala privada" })
+          return
+        }
+
+        if (!data || (data.type !== "adoption" && data.type !== "sponsorship") || !data.animalId) {
+          callback?.({ ok: false, error: "Datos de solicitud inválidos" })
+          return
+        }
+
+        const animalId = BigInt(data.animalId)
+        const animal = await getAnimalById(animalId)
+
+        if (!animal) {
+          callback?.({ ok: false, error: "Animal no encontrado" })
+          return
+        }
+
+        const isAdoption = data.type === "adoption"
+
+        await notificationService.createNotification({
+          userId,
+          title: isAdoption
+            ? "Solicitud de adopción recibida"
+            : "Solicitud de apadrinamiento recibida",
+          body: isAdoption
+            ? `Hemos recibido tu solicitud para adoptar a ${animal.name}.`
+            : `Hemos recibido tu solicitud para apadrinar a ${animal.name}.`,
+        })
+
+        callback?.({ ok: true })
+      } catch (error) {
+        callback?.({ ok: false, error: "Error al procesar la solicitud" })
+      }
     })
 
     socket.on("get_history", async (callback) => {
