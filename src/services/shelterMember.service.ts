@@ -1,5 +1,5 @@
 import { prisma } from '@/config/prisma'
-import { CreateShelterMemberDTO, UpdateShelterMemberDTO } from '@/dtos/shelterMember.DTO'
+import { CreateShelterMemberDTO, UpdateShelterMemberDTO } from '@/dtos/shelterMemberDTO'
 import { ShelterMemberResponse, shelterMemberSelect } from '@/models/shelterMember.model'
 import { PaginatedResponse, PaginationParams } from '@/types'
 import { getPaginationParams, getSearchFilter } from '@/utils/pagination'

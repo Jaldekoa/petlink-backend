@@ -3,14 +3,14 @@ import { verifyToken, requireRole } from '@/middlewares/auth.middleware'
 import { user_role } from '@prisma/client'
 import { Router } from 'express'
 
-const adoptionRouter = Router()
+const adoptionRoutes = Router()
 
-adoptionRouter.get('/me', verifyToken, adoptionController.getMyAdoptions)
-adoptionRouter.post('/', verifyToken, adoptionController.createAdoption)
+adoptionRoutes.get('/me', verifyToken, adoptionController.getMyAdoptions)
+adoptionRoutes.post('/', verifyToken, adoptionController.createAdoption)
 
-adoptionRouter.get('/', verifyToken, requireRole(user_role.administrador, user_role.trabajador), adoptionController.getAdoptions)
-adoptionRouter.get('/:id', verifyToken, requireRole(user_role.administrador, user_role.trabajador), adoptionController.getAdoptionById)
-adoptionRouter.put('/:id', verifyToken, requireRole(user_role.administrador, user_role.trabajador), adoptionController.updateAdoption)
-adoptionRouter.delete('/:id', verifyToken, requireRole(user_role.administrador), adoptionController.deleteAdoption)
+adoptionRoutes.get('/', verifyToken, requireRole(user_role.administrador, user_role.trabajador), adoptionController.getAdoptions)
+adoptionRoutes.get('/:id', verifyToken, requireRole(user_role.administrador, user_role.trabajador), adoptionController.getAdoptionById)
+adoptionRoutes.put('/:id', verifyToken, requireRole(user_role.administrador, user_role.trabajador), adoptionController.updateAdoption)
+adoptionRoutes.delete('/:id', verifyToken, requireRole(user_role.administrador), adoptionController.deleteAdoption)
 
-export default adoptionRouter
+export default adoptionRoutes

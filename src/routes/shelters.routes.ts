@@ -1,15 +1,15 @@
 import { Router } from "express";
 import * as sheltersController from "../controllers/shelters.controller";
+import { requireRole, verifyToken } from "@/middlewares/auth.middleware";
+import { user_role } from "@prisma/client";
 
-const router = Router();
+const sheltersRoutes = Router();
 
-// Rutas públicas (cualquiera puede acceder)
-router.get("/", sheltersController.getAll);
-router.get("/:id", sheltersController.getById);
+sheltersRoutes.get("/", verifyToken, sheltersController.getAll);
+sheltersRoutes.get("/:id", verifyToken, sheltersController.getById);
 
-// Rutas protegidas (requieren autenticación)
-router.post("/", sheltersController.create);
-router.patch("/:id", sheltersController.update);
-router.delete("/:id", sheltersController.remove);
+sheltersRoutes.post("/", verifyToken, requireRole(user_role.administrador, user_role.trabajador), sheltersController.create);
+sheltersRoutes.patch("/:id", verifyToken, requireRole(user_role.administrador, user_role.trabajador), sheltersController.update);
+sheltersRoutes.delete("/:id", verifyToken, requireRole(user_role.administrador, user_role.trabajador), sheltersController.remove);
 
-export default router;
+export default sheltersRoutes;

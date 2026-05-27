@@ -3,15 +3,15 @@ import { verifyToken, requireRole } from '@/middlewares/auth.middleware'
 import { user_role } from '@prisma/client'
 import { Router } from 'express'
 
-const shelterMemberRouter = Router()
+const shelterMemberRoutes = Router()
 
-shelterMemberRouter.get('/', verifyToken, requireRole(user_role.administrador), shelterMemberController.getShelterMembers)
-shelterMemberRouter.post('/', verifyToken, requireRole(user_role.administrador), shelterMemberController.createShelterMember)
-shelterMemberRouter.put('/:id', verifyToken, requireRole(user_role.administrador), shelterMemberController.updateShelterMember)
-shelterMemberRouter.delete('/:id', verifyToken, requireRole(user_role.administrador), shelterMemberController.deleteShelterMember)
+shelterMemberRoutes.get('/', verifyToken, requireRole(user_role.administrador), shelterMemberController.getShelterMembers)
+shelterMemberRoutes.post('/', verifyToken, requireRole(user_role.administrador), shelterMemberController.createShelterMember)
+shelterMemberRoutes.put('/:id', verifyToken, requireRole(user_role.administrador), shelterMemberController.updateShelterMember)
+shelterMemberRoutes.delete('/:id', verifyToken, requireRole(user_role.administrador), shelterMemberController.deleteShelterMember)
 
-shelterMemberRouter.get('/shelter/:shelterId', verifyToken, shelterMemberController.getMembersByShelter)
-shelterMemberRouter.get('/user/:userId', verifyToken, shelterMemberController.getSheltersByUser)
-shelterMemberRouter.get('/:id', verifyToken, shelterMemberController.getShelterMemberById)
+shelterMemberRoutes.get('/shelter/:shelterId', verifyToken, shelterMemberController.getMembersByShelter)
+shelterMemberRoutes.get('/user/:userId', verifyToken, shelterMemberController.getSheltersByUser)
+shelterMemberRoutes.get('/:id', verifyToken, shelterMemberController.getShelterMemberById)
 
-export default shelterMemberRouter
+export default shelterMemberRoutes

@@ -2,12 +2,12 @@ import { notificationController } from '@/controllers'
 import { verifyToken } from '@/middlewares'
 import { Router } from 'express'
 
-const notificationRouter = Router()
+const notificationRoutes = Router()
 
-notificationRouter.get('/', verifyToken, notificationController.getMyNotifications)
-notificationRouter.patch('/read-all', verifyToken, notificationController.markAllAsRead)
-notificationRouter.patch('/:id/read', verifyToken, notificationController.markAsRead)
-notificationRouter.delete('/all', verifyToken, notificationController.deleteAllNotifications)
-notificationRouter.delete('/:id', verifyToken, notificationController.deleteNotification)
+notificationRoutes.get('/', verifyToken, notificationController.getMyNotifications)
+notificationRoutes.patch('/read-all', verifyToken, notificationController.markAllAsRead)
+notificationRoutes.patch('/:id/read', verifyToken, notificationController.markAsRead)
+notificationRoutes.delete('/all', verifyToken, notificationController.deleteAllNotifications)
+notificationRoutes.delete('/:id', verifyToken, notificationController.deleteNotification)
 
-export default notificationRouter
+export default notificationRoutes

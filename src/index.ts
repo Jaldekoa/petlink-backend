@@ -7,15 +7,6 @@ import { connectMongoDB } from "./config/mongoose";
 import { setupSocket } from "./chat/socket/chat.socket";
 import router from "./routes/routes";
 
-// === RUTAS IMPLEMENTADAS ===
-import sheltersRoutes from "./routes/shelters.routes";
-import animalsRoutes from "./routes/animals.routes";
-import animalImagesRoutes from "./routes/animalImages.routes";
-import likesRoutes from "./routes/likes.routes";
-import paymentHistoryRoutes from "./routes/paymentHistory.routes";
-import { verifyToken } from "./middlewares";
-
-
 // Fix para serializar BigInt a JSON (necesario con Prisma + PostgreSQL)
 (BigInt.prototype as any).toJSON = function () { return this.toString(); };
 
@@ -33,20 +24,7 @@ connectMongoDB();
 
 setupSocket(httpServer);
 
-// === RUTA DE PRUEBA ===
-app.get("/", (_req: Request, res: Response) => {
-  res.json({ status: "ok", message: "PetLink API" });
-});
 app.use("/", router);
-
-
-// === RUTAS DE SHELTERS, ANIMALS, LIKES Y PAYMENT-HISTORY ===
-app.use("/api/shelters", sheltersRoutes);
-app.use("/api/animals", animalsRoutes);
-app.use("/api/animals/:animalId/images", animalImagesRoutes);
-app.use("/api/likes", likesRoutes);
-app.use("/api/payment-history", paymentHistoryRoutes);
-
 
 
 // === SERVER ===
@@ -55,6 +33,4 @@ const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`Chat con WebSocket`);
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
 });
