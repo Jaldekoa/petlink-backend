@@ -1,5 +1,5 @@
-export * from './userDTO'
 export * from './shelterMemberDTO'
 export * from './adoptionDTO'
-export * from './sponsorshipDTO'
 export * from './notificationDTO'
+export * from './userDTO'
+export * from './sponsorshipDTO'

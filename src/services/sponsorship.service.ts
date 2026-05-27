@@ -1,6 +1,6 @@
 import { prisma } from '@/config/prisma'
 import { CreateSponsorshipDTO, UpdateSponsorshipDTO } from '@/dtos'
-import { SponsorshipResponse, sponsorshipSelect } from '@/models/sponsorshipModel'
+import { SponsorshipResponse, sponsorshipSelect } from '@/models/sponsorship.model'
 import { PaginatedResponse, PaginationParams } from '@/types'
 import { getPaginationParams } from '@/utils/pagination'
 import { sponsorship_status } from '@prisma/client'
