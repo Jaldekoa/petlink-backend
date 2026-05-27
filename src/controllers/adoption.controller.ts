@@ -53,6 +53,10 @@ const createAdoption = async (req: Request, res: Response): Promise<void> => {
         })
         res.status(201).json(adoption)
     } catch (error: any) {
+        if (error.statusCode) {
+            res.status(error.statusCode).json({ error: error.message })
+            return
+        }
         if (error.code === 'P2002') {
             res.status(409).json({ error: 'Ya tienes una solicitud de adopción para este animal' })
             return
