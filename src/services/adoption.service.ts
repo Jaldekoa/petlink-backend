@@ -1,6 +1,6 @@
 import { prisma } from '@/config/prisma'
 import { CreateAdoptionDTO, UpdateAdoptionDTO } from '@/dtos'
-import { AdoptionResponse, adoptionSelect } from '@/models/adoptionModel'
+import { AdoptionResponse, adoptionSelect } from '@/models/adoption.model'
 import { PaginatedResponse, PaginationParams } from '@/types'
 import { getPaginationParams } from '@/utils/pagination'
 import { adoption_status } from '@prisma/client'

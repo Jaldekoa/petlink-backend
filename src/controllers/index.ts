@@ -1,6 +1,10 @@
-export * from './userController'
-export * from './authController'
+export * from './user.controller'
+export * from './auth.controller'
 export * from './shelterMember.controller'
 export * from './adoption.controller'
 export * from './sponsorship.controller'
 export * from './notification.controller'
+export * from './animalImages.controller'
+export * from './likes.controller'
+export * from './paymentHistory.controller'
+

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import userRouter from "./userRouter";
+import userRouter from "./user.routes";
 import { verifyToken } from "@/middlewares";
-import shelterMemberRouter from "./shelterMemberRouter";
+import shelterMemberRouter from "./shelterMember.routes";
 import adoptionRouter from "./adoptionRouter";
 import sponsorshipRouter from "./sponsorship.routes";
 import notificationRouter from "./notification.routes";

@@ -1,6 +1,6 @@
 import { prisma } from "@/config/prisma"
 import { CreateUserDTO, UpdateUserAdminDTO, UpdateUserDTO } from "@/dtos"
-import { UserResponse, userSelect } from "@/models/userModel"
+import { UserResponse, userSelect } from "@/models/user.model"
 import { PaginatedResponse, PaginationParams } from "@/types"
 import { getPaginationParams, getSearchFilter } from "@/utils/pagination"
 import { user_role } from "@prisma/client"
